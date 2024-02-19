@@ -35,15 +35,14 @@ class Song
     private ?File $filePathFile = null;
 
 
-    #[ORM\OneToMany(targetEntity: Preference::class, mappedBy: 'song')]
-    private Collection $preference;
-
     #[ORM\ManyToMany(targetEntity: Playlist::class, mappedBy: 'song')]
     private Collection $playlists;
 
+    #[ORM\ManyToOne(inversedBy: 'song')]
+    private ?Album $album = null;
+
     public function __construct()
     {
-        $this->preference = new ArrayCollection();
         $this->playlists = new ArrayCollection();
     }
 
@@ -101,36 +100,6 @@ class Song
     }
 
     /**
-     * @return Collection<int, Preference>
-     */
-    public function getPreference(): Collection
-    {
-        return $this->preference;
-    }
-
-    public function addPreference(Preference $preference): static
-    {
-        if (!$this->preference->contains($preference)) {
-            $this->preference->add($preference);
-            $preference->setSong($this);
-        }
-
-        return $this;
-    }
-
-    public function removePreference(Preference $preference): static
-    {
-        if ($this->preference->removeElement($preference)) {
-            // set the owning side to null (unless already changed)
-            if ($preference->getSong() === $this) {
-                $preference->setSong(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, Playlist>
      */
     public function getPlaylists(): Collection
@@ -153,6 +122,18 @@ class Song
         if ($this->playlists->removeElement($playlist)) {
             $playlist->removeSong($this);
         }
+
+        return $this;
+    }
+
+    public function getAlbum(): ?Album
+    {
+        return $this->album;
+    }
+
+    public function setAlbum(?Album $album): static
+    {
+        $this->album = $album;
 
         return $this;
     }

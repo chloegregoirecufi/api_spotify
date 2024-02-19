@@ -45,13 +45,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Playlist::class, mappedBy: 'user')]
     private Collection $playlisst;
 
-    #[ORM\OneToMany(targetEntity: Preference::class, mappedBy: 'user')]
-    private Collection $preference;
+    #[ORM\ManyToMany(targetEntity: Album::class, mappedBy: 'user')]
+    private Collection $albums;
 
     public function __construct()
     {
         $this->playlisst = new ArrayCollection();
-        $this->preference = new ArrayCollection();
+        $this->albums = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -191,30 +191,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Preference>
+     * @return Collection<int, Album>
      */
-    public function getPreference(): Collection
+    public function getAlbums(): Collection
     {
-        return $this->preference;
+        return $this->albums;
     }
 
-    public function addPreference(Preference $preference): static
+    public function addAlbum(Album $album): static
     {
-        if (!$this->preference->contains($preference)) {
-            $this->preference->add($preference);
-            $preference->setUser($this);
+        if (!$this->albums->contains($album)) {
+            $this->albums->add($album);
+            $album->addUser($this);
         }
 
         return $this;
     }
 
-    public function removePreference(Preference $preference): static
+    public function removeAlbum(Album $album): static
     {
-        if ($this->preference->removeElement($preference)) {
-            // set the owning side to null (unless already changed)
-            if ($preference->getUser() === $this) {
-                $preference->setUser(null);
-            }
+        if ($this->albums->removeElement($album)) {
+            $album->removeUser($this);
         }
 
         return $this;

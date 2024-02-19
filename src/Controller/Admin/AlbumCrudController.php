@@ -30,10 +30,9 @@ class AlbumCrudController extends AbstractCrudController
         return [
             IdField::new('id')->hideOnForm(),
             TextField::new('title', 'Titre de l\'album'),
-            TextEditorField::new('description', 'description de l\'album'),
             //champs d'association avec une autre table
             AssociationField::new('genre', 'Catégorie de l\'album'),
-            AssociationField::new('artist', 'Nom de l\'artiste'),
+            AssociationField::new('Artist', 'Nom de l\'artiste'),
             ImageField::new('imagePath', 'Choisir une imahe de couverture')
                 ->setBasePath(self::ALBUM_BASE_PATH)
                 ->setUploadDir(self::ALBUM_UPLOAD_DIR)
@@ -45,10 +44,10 @@ class AlbumCrudController extends AbstractCrudController
                         $file->getFilename(),
                         $file->guessExtension()
                     )),
-            DateField::new('releaseDate', 'Date de sortie'),
+            DateField::new('realaseDate', 'Date de sortie'),
             //ici on cahce CreateAt et UpdateAt on passera les données grace au persister
             DateField::new('createdAt')->hideOnForm(),
-            DateField::new('UpdatedAt')->hideOnForm(),
+            DateField::new('updateAt')->hideOnForm(),
         ];
     }
 
@@ -56,7 +55,8 @@ class AlbumCrudController extends AbstractCrudController
     public function persistEntity(EntityManagerInterface $em, $entityInstance): void
     {
         if(!$entityInstance instanceof Album) return;
-        $entityInstance->setCreatedAt(new \DateTime());
+        $entityInstance->setCreatedAt(new \DateTimeImmutable());
+        $entityInstance->setUpdateAt($entityInstance->getCreatedAt());
         parent::persistEntity($em, $entityInstance);
     }
 
@@ -64,7 +64,7 @@ class AlbumCrudController extends AbstractCrudController
     public function updateEntity(EntityManagerInterface $em, $entityInstance): void
     {
         if(!$entityInstance instanceof Album) return;
-        $entityInstance->setUpdateAt(new \DateTime());
+        $entityInstance->setUpdateAt(new \DateTimeImmutable());
         parent::updateEntity($em, $entityInstance);
     }
 

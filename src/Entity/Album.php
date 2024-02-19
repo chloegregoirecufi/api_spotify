@@ -29,20 +29,17 @@ class Album
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $realaseDate = null;
+    #[ORM\Column()]
+    private ?\DateTimeImmutable $realaseDate = null;
 
     #[ORM\Column(length: 255)]
     private ?string $imagePath = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $createdAt = null;
+    #[ORM\Column()]
+    private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $updateAt = null;
-
-    #[ORM\OneToMany(targetEntity: Preference::class, mappedBy: 'album')]
-    private Collection $preference;
+    #[ORM\Column()]
+    private ?\DateTimeImmutable $updateAt = null;
 
 
     #[ORM\ManyToOne(inversedBy: 'albums')]
@@ -51,9 +48,16 @@ class Album
     #[ORM\ManyToOne(inversedBy: 'albums')]
     private ?Genre $genre = null;
 
+    #[ORM\OneToMany(targetEntity: Song::class, mappedBy: 'album')]
+    private Collection $song;
+
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'albums')]
+    private Collection $user;
+
     public function __construct()
     {
-        $this->preference = new ArrayCollection();
+        $this->song = new ArrayCollection();
+        $this->user = new ArrayCollection();
     }
 
 
@@ -74,12 +78,12 @@ class Album
         return $this;
     }
 
-    public function getRealaseDate(): ?\DateTimeInterface
+    public function getRealaseDate(): ?\DateTimeImmutable
     {
         return $this->realaseDate;
     }
 
-    public function setRealaseDate(\DateTimeInterface $realaseDate): static
+    public function setRealaseDate(\DateTimeImmutable $realaseDate): static
     {
         $this->realaseDate = $realaseDate;
 
@@ -98,24 +102,24 @@ class Album
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdateAt(): ?\DateTimeInterface
+    public function getUpdateAt(): ?\DateTimeImmutable
     {
         return $this->updateAt;
     }
 
-    public function setUpdateAt(\DateTimeInterface $updateAt): static
+    public function setUpdateAt(\DateTimeImmutable $updateAt): static
     {
         $this->updateAt = $updateAt;
 
@@ -125,36 +129,6 @@ class Album
     public function __toString(): string
     {
         return $this->title;
-    }
-
-    /**
-     * @return Collection<int, Preference>
-     */
-    public function getPreference(): Collection
-    {
-        return $this->preference;
-    }
-
-    public function addPreference(Preference $preference): static
-    {
-        if (!$this->preference->contains($preference)) {
-            $this->preference->add($preference);
-            $preference->setAlbum($this);
-        }
-
-        return $this;
-    }
-
-    public function removePreference(Preference $preference): static
-    {
-        if ($this->preference->removeElement($preference)) {
-            // set the owning side to null (unless already changed)
-            if ($preference->getAlbum() === $this) {
-                $preference->setAlbum(null);
-            }
-        }
-
-        return $this;
     }
 
 
@@ -178,6 +152,60 @@ class Album
     public function setGenre(?Genre $genre): static
     {
         $this->genre = $genre;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Song>
+     */
+    public function getSong(): Collection
+    {
+        return $this->song;
+    }
+
+    public function addSong(Song $song): static
+    {
+        if (!$this->song->contains($song)) {
+            $this->song->add($song);
+            $song->setAlbum($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSong(Song $song): static
+    {
+        if ($this->song->removeElement($song)) {
+            // set the owning side to null (unless already changed)
+            if ($song->getAlbum() === $this) {
+                $song->setAlbum(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUser(): Collection
+    {
+        return $this->user;
+    }
+
+    public function addUser(User $user): static
+    {
+        if (!$this->user->contains($user)) {
+            $this->user->add($user);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): static
+    {
+        $this->user->removeElement($user);
 
         return $this;
     }

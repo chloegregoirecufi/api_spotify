@@ -43,7 +43,7 @@ class SongCrudController extends AbstractCrudController
                 ->hideOnIndex()
                 ->hideOnDetail()
             ->addHtmlContentsToBody('<p>hello</p>'),
-            NumberField::new('duration', 'duréer de la chanson'),
+            NumberField::new('duration', 'durée de la chanson'),
             AssociationField::new('album', 'Album associé'),
         ];
     }
