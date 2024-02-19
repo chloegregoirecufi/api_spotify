@@ -1,4 +1,4 @@
-name: app-appli-musique
+name: api_symfony
 recipe: symfony
 config:
   php: '8.2'
@@ -11,7 +11,7 @@ services:
     creds:
       user: chloe
       password: admin
-      database: appli-musique
+      database: database_symfony
   node:
     type: node:18
     build:

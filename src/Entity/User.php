@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -36,6 +38,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     private ?string $role = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $playlist = null;
+
+    #[ORM\OneToMany(targetEntity: Playlist::class, mappedBy: 'user')]
+    private Collection $playlisst;
+
+    #[ORM\OneToMany(targetEntity: Preference::class, mappedBy: 'user')]
+    private Collection $preference;
+
+    public function __construct()
+    {
+        $this->playlisst = new ArrayCollection();
+        $this->preference = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -139,6 +156,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRole(string $role): static
     {
         $this->role = $role;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Playlist>
+     */
+    public function getPlaylisst(): Collection
+    {
+        return $this->playlisst;
+    }
+
+    public function addPlaylisst(Playlist $playlisst): static
+    {
+        if (!$this->playlisst->contains($playlisst)) {
+            $this->playlisst->add($playlisst);
+            $playlisst->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePlaylisst(Playlist $playlisst): static
+    {
+        if ($this->playlisst->removeElement($playlisst)) {
+            // set the owning side to null (unless already changed)
+            if ($playlisst->getUser() === $this) {
+                $playlisst->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Preference>
+     */
+    public function getPreference(): Collection
+    {
+        return $this->preference;
+    }
+
+    public function addPreference(Preference $preference): static
+    {
+        if (!$this->preference->contains($preference)) {
+            $this->preference->add($preference);
+            $preference->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePreference(Preference $preference): static
+    {
+        if ($this->preference->removeElement($preference)) {
+            // set the owning side to null (unless already changed)
+            if ($preference->getUser() === $this) {
+                $preference->setUser(null);
+            }
+        }
 
         return $this;
     }

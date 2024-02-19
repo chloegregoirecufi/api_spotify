@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PlaylistRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PlaylistRepository::class)]
@@ -15,6 +17,19 @@ class Playlist
 
     #[ORM\Column(length: 255)]
     private ?string $title = null;
+
+    #[ORM\ManyToOne(inversedBy: 'playlisst')]
+    private ?User $user = null;
+
+    #[ORM\ManyToMany(targetEntity: Song::class, inversedBy: 'playlists')]
+    private Collection $song;
+
+    public function __construct()
+    {
+        $this->song = new ArrayCollection();
+    }
+
+
 
     public function getId(): ?int
     {
@@ -32,4 +47,41 @@ class Playlist
 
         return $this;
     }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Song>
+     */
+    public function getSong(): Collection
+    {
+        return $this->song;
+    }
+
+    public function addSong(Song $song): static
+    {
+        if (!$this->song->contains($song)) {
+            $this->song->add($song);
+        }
+
+        return $this;
+    }
+
+    public function removeSong(Song $song): static
+    {
+        $this->song->removeElement($song);
+
+        return $this;
+    }
+
 }
