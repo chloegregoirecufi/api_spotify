@@ -4,18 +4,17 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use ApiPlatform\Metadata\ApiFilter;
 use App\Repository\AlbumRepository;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: AlbumRepository::class)]
-//on expose l'entité  à l'api
-//il suffit simplement de faire référene à ApiRessourse
-#[ApiResource]
+//On expose l'entité à l'api
+#[ApiResource(
+    //On déclare les groupes de serialisation et de déserialisation
+    normalizationContext: ['groups' => ['album:read']],
+    denormalizationContext: ['groups' => ['album:write']],
+)]
 // #[ApiFilter(
 //     SearchFilter::class, properties: ['id' => 'exact', 'title' => 'exact', 'description' => 'partial', 'genre.label' => 'exact']
 // )]
